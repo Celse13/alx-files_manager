@@ -1,4 +1,3 @@
-// AuthController.js
 const { v4: uuidv4 } = require('uuid');
 const sha1 = require('sha1');
 const redisClient = require('../utils/redis');
@@ -14,7 +13,7 @@ class AuthController {
     }
     const token = uuidv4();
     await redisClient.set(`auth_${token}`, user._id.toString(), 'EX', 24 * 60 * 60);
-    res.status(200).json({ token });
+    return res.status(200).json({ token });
   }
 
   static async getDisconnect(req, res) {
@@ -24,6 +23,8 @@ class AuthController {
       return res.status(401).json({ error: 'Unauthorized' });
     }
     await redisClient.del(`auth_${token}`);
-    res.status(204).end();
+    return res.status(204).end();
   }
 }
+
+module.exports = AuthController;
