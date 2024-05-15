@@ -7,8 +7,21 @@ class DBClient {
     const database = process.env.DB_DATABASE || 'files_manager';
     const url = `mongodb://${host}:${port}/${database}`;
 
-    this.client = new MongoClient(url);
-    this.client.connect();
+    this.client = new MongoClient(url, { useUnifiedTopology: true });
+    this.client.connect()
+      .then(() => {
+        this._db = this.client.db(database);
+        console.log('MongoDB connected successfully');
+      }).catch((err) => {
+        console.error('MongoDB connection error:', err);
+      });
+  }
+
+  get db() {
+    if (!this._db) {
+      throw new Error('Database connection not ready');
+    }
+    return this._db;
   }
 
   isAlive() {
